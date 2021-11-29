@@ -31,11 +31,15 @@ WORKDIR /conmon
 RUN test -n "${CONMON_VERSION}" \
  && git clone --config advice.detachedHead=false --depth 1 --branch "v${CONMON_VERSION}" \
         https://github.com/containers/conmon.git .
-RUN make git-vars bin/conmon \
+RUN mkdir -p /usr/local/share/man/man8 \
+ && make git-vars bin/conmon \
         PKG_CONFIG='pkg-config --static' \
         CFLAGS='-std=c99 -Os -Wall -Wextra -Werror -static' \
         LDFLAGS='-s -w -static' \
- && mv bin/conmon /usr/local/bin/conmon
+ && make -C docs GOMD2MAN=go-md2man \
+ && mv bin/conmon /usr/local/bin/conmon \
+ && mv docs/conmon.8 /usr/local/share/man/man8
 
 FROM scratch AS local
-COPY --from=conmon /usr/local/bin/conmon .
+COPY --from=conmon /usr/local/bin/conmon ./bin/
+COPY --from=conmon /usr/local/share/man ./share/man/
