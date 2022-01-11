@@ -26,7 +26,7 @@ RUN apk add --update-cache --no-cache \
 
 FROM base AS conmon
 # renovate: datasource=github-releases depName=containers/conmon
-ARG CONMON_VERSION=2.0.31
+ARG CONMON_VERSION=2.0.32
 WORKDIR /conmon
 RUN test -n "${CONMON_VERSION}" \
  && git clone --config advice.detachedHead=false --depth 1 --branch "v${CONMON_VERSION}" \
