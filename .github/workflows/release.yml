@@ -43,6 +43,7 @@ jobs:
           path: conmon-${{ matrix.arch }}.tar.gz
 
   release:
+    if: github.event_name != 'pull_request'
     needs:
     - build
     runs-on: ubuntu-latest
@@ -55,14 +56,12 @@ jobs:
 
       - name: Get version
         id: get_version
-        if: github.event_name != 'pull_request'
         run: |
           version="$(cat Dockerfile | grep "ARG CONMON_VERSION=" | sed -E 's/ARG CONMON_VERSION=//')"
           echo "::set-output name=version::${version}"
 
       - name: Create release
         id: create_release
-        if: github.event_name != 'pull_request'
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.BOT_GITHUB_TOKEN }}
