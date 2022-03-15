@@ -36,12 +36,6 @@ jobs:
               --output type=local,dest=.; \
           tar -czf conmon-${{ matrix.arch }}.tar.gz bin share
 
-      - name: Get version
-        id: get_version
-        if: github.event_name != 'pull_request'
-        run: |
-          echo "::set-output name=version::$(./bin/conmon --version | grep "conmon version" | cut -d' ' -f3)"
-
       - name: Store tarball
         uses: actions/upload-artifact@v3
         with:
@@ -53,8 +47,21 @@ jobs:
     - build
     runs-on: ubuntu-latest
     steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
     
       - uses: actions/download-artifact@v3
+
+      - run: |
+          find . -type f
+
+      - name: Get version
+        id: get_version
+        if: github.event_name != 'pull_request'
+        run: |
+          version="$(cat Dockerfile | grep "ARG CONMON_VERSION=" | sed -E 's/ARG CONMON_VERSION=//')"
+          echo "::set-output name=version::${version}"
 
       - name: Create release
         id: create_release
