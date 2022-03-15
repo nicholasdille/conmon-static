@@ -55,8 +55,6 @@ jobs:
     steps:
     
       - uses: actions/download-artifact@v3
-        with:
-          name: conmon-*.tar.gz
 
       - name: Create release
         id: create_release
