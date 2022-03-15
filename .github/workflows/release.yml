@@ -7,8 +7,14 @@ on:
   pull_request:
 
 jobs:
-  build-static:
+
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch:
+          - amd64
+          - arm64
     steps:
 
       - name: Checkout
@@ -19,15 +25,32 @@ jobs:
           DOCKER_BUILDKIT: 1
         run: |
           docker build . \
+              --platform linux/${{ arch }} \
               --target local \
               --output type=local,dest=.; \
-          tar -czf conmon.tar.gz bin share
+          tar -czf conmon-${{ arch }}.tar.gz bin share
 
       - name: Get version
         id: get_version
         if: github.event_name != 'pull_request'
         run: |
           echo "::set-output name=version::$(./bin/conmon --version | grep "conmon version" | cut -d' ' -f3)"
+
+      - name: Store tarball
+        uses: actions/upload-artifact@v3
+        with:
+          name: conmon-${{ arch }}.tar.gz
+          path: conmon-${{ arch }}.tar.gz
+
+  release:
+    needs:
+    - build
+    runs-on: ubuntu-latest
+    steps:
+    
+      - uses: actions/download-artifact@v3
+        with:
+          name: conmon-*.tar.gz
 
       - name: Create release
         id: create_release
@@ -42,4 +65,4 @@ jobs:
           omitBody: true
           prerelease: false
           replacesArtifacts: true
-          artifacts: "conmon.tar.gz"
+          artifacts: "conmon-*.tar.gz"
