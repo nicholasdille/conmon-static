@@ -25,10 +25,10 @@ jobs:
           DOCKER_BUILDKIT: 1
         run: |
           docker build . \
-              --platform linux/${{ arch }} \
+              --platform linux/${{ matrix.arch }} \
               --target local \
               --output type=local,dest=.; \
-          tar -czf conmon-${{ arch }}.tar.gz bin share
+          tar -czf conmon-${{ matrix.arch }}.tar.gz bin share
 
       - name: Get version
         id: get_version
@@ -39,8 +39,8 @@ jobs:
       - name: Store tarball
         uses: actions/upload-artifact@v3
         with:
-          name: conmon-${{ arch }}.tar.gz
-          path: conmon-${{ arch }}.tar.gz
+          name: conmon-${{ matrix.arch }}.tar.gz
+          path: conmon-${{ matrix.arch }}.tar.gz
 
   release:
     needs:
