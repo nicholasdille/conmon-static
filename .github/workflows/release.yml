@@ -51,10 +51,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
     
-      - uses: actions/download-artifact@v3
-
-      - run: |
-          find . -type f
+      - uses: actions/download-artifact@v3  
 
       - name: Get version
         id: get_version
@@ -76,4 +73,4 @@ jobs:
           omitBody: true
           prerelease: false
           replacesArtifacts: true
-          artifacts: "conmon-*.tar.gz"
+          artifacts: "*/conmon-*.tar.gz"
